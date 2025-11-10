@@ -9,6 +9,122 @@
 - **📊 데이터 기반**: 네이버 검색량 + 쿠팡 상품 수 분석
 - **📁 엑셀 리포트**: 결과를 엑셀로 자동 생성
 - **🎓 초보 친화적**: 비개발자도 쉽게 사용 가능
+- **🆕 고급 스크래핑**: Selenium 기반 봇 감지 우회 시스템
+
+## 🆕 쿠팡 고급 스크래핑 시스템 (NEW!)
+
+Selenium 기반의 고급 쿠팡 스크래핑 시스템이 추가되었습니다!
+
+### 🚀 주요 기능
+
+- **🤖 봇 감지 완전 우회**: undetected-chromedriver로 Akamai Bot Manager 우회
+- **📊 상세 정보 수집**: 11개 컬럼의 완벽한 상품 정보 (상품명, 가격, 할인율, 판매구분, 별점 등)
+- **🎨 GUI 인터페이스**: ttkthemes 기반의 사용하기 쉬운 GUI
+- **⚡ 병렬 처리**: 여러 검색어 동시 처리 지원 (1-5개)
+- **📡 네트워크 모니터링**: API 엔드포인트 자동 발견 및 분석
+- **💾 자동 저장**: 중단 시 자동 저장 및 이어하기 모드
+- **🖼️ 이미지 다운로드**: 상품 이미지 자동 다운로드 (선택사항)
+- **🔄 중지 기능**: 안전한 중단 및 데이터 보존
+
+### 📱 GUI 사용법
+
+1. **GUI 실행**
+   ```bash
+   python coupang_gui.py
+   ```
+
+2. **검색어 추가**
+   - 검색어 또는 URL 입력
+   - '추가' 버튼 클릭 (여러 개 추가 가능)
+
+3. **옵션 설정**
+   - 수집 페이지 수: 1-100 (기본 50)
+   - 동시 수집 개수: 1-5 (권장 1-2)
+   - 헤드리스 모드: 브라우저 숨김 모드
+   - 이미지 다운로드: 상품 이미지 저장 (용량 주의)
+   - 이어하기 모드: 중단 시 자동 재개
+   - 네트워크 모니터링: API 엔드포인트 분석
+
+4. **수집 시작**
+   - '수집 시작' 버튼 클릭
+   - 진행 상황을 실시간으로 확인
+   - 완료 시 Excel 파일 자동 생성
+
+### 💻 스크립트 사용법
+
+```python
+from coupang_scraper_integrated import initialize_driver, setup_coupang_main, run_full_pipeline
+
+# 드라이버 초기화
+driver = initialize_driver(headless=False)
+driver = setup_coupang_main(driver)
+
+# 방법 1: 검색어로 수집
+result = run_full_pipeline(driver, '무선마우스', max_pages=5)
+
+# 방법 2: 검색 페이지 URL로 수집 (필터, 정렬 등 유지)
+result = run_full_pipeline(driver, 'https://www.coupang.com/np/search?q=무선마우스')
+
+# 방법 3: 상품 상세 URL로 수집
+result = run_full_pipeline(driver, 'https://www.coupang.com/vp/products/123456')
+
+# 드라이버 종료
+from coupang_scraper_integrated import close_browser
+close_browser(driver)
+```
+
+### 📊 수집 데이터 (11개 컬럼)
+
+| 컬럼명 | 설명 | 예시 |
+|--------|------|------|
+| 번호 | 순번 | 1, 2, 3... |
+| 상품ID | 쿠팡 상품 ID | 123456789 |
+| 상품명 | 상품 이름 | "로지텍 무선마우스 M185" |
+| 가격_할인전 | 정가 | 29,900원 |
+| 할인율 | 할인 비율 | 30% |
+| 판매가 | 최종 가격 | 20,930원 |
+| 판매구분 | 배송 타입 | 로켓배송, 로켓프레쉬, 판매자로켓, 일반 |
+| 배송정보 | 배송 상세 | "내일(화) 12/12 도착 보장" |
+| 별점 | 평점 | 4.5 |
+| 리뷰수 | 리뷰 개수 | (1,234) |
+| 링크 | 상품 URL | https://www.coupang.com/vp/products/... |
+
+### 📡 네트워크 모니터링
+
+API 엔드포인트를 자동으로 발견하고 분석합니다:
+
+- **XHR/Fetch 요청 자동 캡처**: 모든 네트워크 요청 기록
+- **엔드포인트별 통계**: 호출 횟수, HTTP 메서드, 상태 코드
+- **JSON 로그 저장**: `logs/network_logs_YYYYMMDD_HHMMSS.json`
+- **API 리포트 생성**: 발견된 엔드포인트 목록 및 분석
+
+### ⚙️ 설정 옵션
+
+| 옵션 | 기본값 | 설명 |
+|------|--------|------|
+| 수집 페이지 수 | 50 | 최대 수집 페이지 (1-100) |
+| 동시 수집 개수 | 1 | 병렬 처리 수 (1-5, 권장 1-2) |
+| 헤드리스 모드 | OFF | 브라우저 창 숨김 |
+| 이미지 다운로드 | OFF | 이미지 로컬 저장 (용량 주의) |
+| 이어하기 모드 | ON | 중단 시 자동 재개 |
+| 네트워크 모니터링 | OFF | API 엔드포인트 분석 |
+
+### 📂 출력 파일
+
+- **상품 목록**: `coupang_{키워드}_{페이지수}페이지_{개수}개_YYYYMMDD.xlsx`
+- **진행 상황**: `progress_search_{키워드}_YYYYMMDD.json`
+- **네트워크 로그**: `logs/network_logs_YYYYMMDD_HHMMSS.json`
+- **이미지**: `images/thumbnail/{상품ID}/` 및 `images/detail/{상품ID}/`
+
+### 🛡️ 봇 감지 우회 전략
+
+1. **undetected-chromedriver 사용**: 자동 버전 감지 및 패치
+2. **인간 행동 시뮬레이션**: 자연스러운 마우스 움직임 및 스크롤
+3. **랜덤 대기 시간**: 정규분포 기반 자연스러운 대기
+4. **동적 헤더 관리**: 페이지 타입별 적절한 HTTP 헤더
+5. **쿠키 관리**: Akamai Bot Manager 쿠키 추적 및 갱신
+
+---
 
 ## 📋 목차
 
